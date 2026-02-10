@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💫 Una Pregunta Especial</title>
+    
+    <!-- Google Fonts - Elegant serif fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Particles.js for stars -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --night-sky: #0a0e27;
+            --star-white: #ffffff;
+            --cosmic-purple: #6366f1;
+            --romantic-pink: #ff6b9d;
+            --gold-accent: #ffd700;
+        }
+        
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1335 50%, #2d1b4e 100%);
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        /* Particles container */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* Heart Animation Container */
+        .heart-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        /* Heart SVG */
+        .heart {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 30px rgba(255, 107, 157, 0.8));
+            transform: translate(-50%, -50%) scale(5);
+            animation: heartZoomIn 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        .heart.moving-corner {
+            animation: moveToCorner 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 2s forwards;
+        }
+        
+        /* Main content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            padding: 20px;
+            text-align: center;
+            gap: 3rem;
+        }
+        
+        .main-content.visible {
+            animation: fadeInContent 1.5s 3.5s ease-out forwards;
+        }
+        
+        /* Question text - SERIF font */
+        .question {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 7vw, 4.5rem);
+            font-weight: 700;
+            color: var(--star-white);
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(255, 107, 157, 0.3),
+                0 0 30px rgba(255, 107, 157, 0.2);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+        }
+        
+        .name {
+            color: var(--romantic-pink);
+            font-weight: 800;
+            display: inline-block;
+            animation: nameGlow 2s ease-in-out infinite;
+        }
+        
+        /* Animated Button */
+        .button-container {
+            position: relative;
+            opacity: 0;
+            animation: fadeInButton 1s 5s ease-out forwards;
+        }
+        
+        .yes-button {
+            position: relative;
+            padding: 1.5rem 4rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 30px rgba(255, 107, 157, 0.4),
+                0 0 20px rgba(255, 107, 157, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        
+        .yes-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 15px 40px rgba(255, 107, 157, 0.6),
+                0 0 30px rgba(255, 107, 157, 0.5);
+        }
+        
+        .yes-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Button hearts animation */
+        .button-heart {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            animation: buttonHeartFloat 3s ease-out infinite;
+            opacity: 0;
+        }
+        
+        .button-heart:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .button-heart:nth-child(2) { left: 25%; animation-delay: 0.3s; }
+        .button-heart:nth-child(3) { left: 40%; animation-delay: 0.6s; }
+        .button-heart:nth-child(4) { left: 55%; animation-delay: 0.9s; }
+        .button-heart:nth-child(5) { left: 70%; animation-delay: 1.2s; }
+        .button-heart:nth-child(6) { left: 85%; animation-delay: 1.5s; }
+        .button-heart:nth-child(7) { left: 15%; animation-delay: 1.8s; }
+        .button-heart:nth-child(8) { left: 60%; animation-delay: 2.1s; }
+        .button-heart:nth-child(9) { left: 35%; animation-delay: 2.4s; }
+        .button-heart:nth-child(10) { left: 80%; animation-delay: 2.7s; }
+        
+        /* Countdown Container */
+        .countdown-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            opacity: 0;
+        }
+        
+        .countdown-container.visible {
+            display: flex;
+            animation: fadeInCountdown 1s ease-out forwards;
+        }
+        
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--romantic-pink);
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+        
+        .countdown-timer {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-value {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            color: white;
+            text-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.5),
+                0 0 40px rgba(255, 107, 157, 0.4);
+            min-width: 100px;
+            text-align: center;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .time-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        /* Shooting stars */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: shoot 3s linear infinite;
+            opacity: 0;
+        }
+        
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, white, transparent);
+            transform: translateX(-100%);
+        }
+        
+        /* Floating hearts in background */
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            animation: floatHeart 10s linear infinite;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px rgba(255, 107, 157, 0.5));
+        }
+        
+        /* Animations */
+        @keyframes heartZoomIn {
+            0% {
+                transform: translate(-50%, -50%) scale(5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes moveToCorner {
+            0% {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                top: 30px;
+                left: 30px;
+                transform: translate(0, 0) scale(0.3);
+            }
+        }
+        
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInButton {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInCountdown {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes nameGlow {
+            0%, 100% {
+                color: var(--romantic-pink);
+                text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+            }
+            50% {
+                color: var(--gold-accent);
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+        }
+        
+        @keyframes buttonHeartFloat {
+            0% {
+                bottom: 100%;
+                opacity: 0;
+                transform: translateX(0) scale(0.5) rotate(0deg);
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 200%;
+                opacity: 0;
+                transform: translateX(50px) scale(1.2) rotate(360deg);
+            }
+        }
+        
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-300px) translateY(300px);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .heart {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .question {
+                font-size: clamp(1.8rem, 8vw, 3rem);
+                padding: 0 15px;
+            }
+            
+            .yes-button {
+                padding: 1.2rem 3rem;
+                font-size: 1.5rem;
+            }
+            
+            .countdown-timer {
+                gap: 1rem;
+            }
+            
+            .time-value {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+                min-width: 80px;
+            }
+        }
+        
+        /* iPhone 12 specific optimizations */
+        @media (max-width: 390px) and (max-height: 844px) {
+            body {
+                -webkit-text-size-adjust: 100%;
+            }
+            
+            .question {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .yes-button {
+                padding: 1rem 2.5rem;
+                font-size: 1.3rem;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+    
+    <!-- Shooting stars -->
+    <div class="shooting-star" style="top: 10%; left: 80%; animation-delay: 0s;"></div>
+    <div class="shooting-star" style="top: 30%; left: 60%; animation-delay: 2s;"></div>
+    <div class="shooting-star" style="top: 50%; left: 90%; animation-delay: 4s;"></div>
+    <div class="shooting-star" style="top: 70%; left: 70%; animation-delay: 6s;"></div>
+    
+    <!-- Heart animation -->
+    <div class="heart-container" id="heartContainer">
+        <svg class="heart" id="heart" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#ff1744;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path d="M50,90 C50,90 10,60 10,40 C10,25 20,15 30,15 C40,15 50,25 50,25 C50,25 60,15 70,15 C80,15 90,25 90,40 C90,60 50,90 50,90 Z" 
+                  fill="url(#heartGradient)" 
+                  stroke="none"/>
+        </svg>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main-content" id="mainContent">
+        <h1 class="question">
+            ¿Quieres ser mi San Valentín<br><span class="name">Jaela</span>?
+        </h1>
+        
+        <!-- Animated button -->
+        <div class="button-container" id="buttonContainer">
+            <button class="yes-button" id="yesButton">
+                Sí, acepto ❤️
+            </button>
+            <div class="button-heart">💕</div>
+            <div class="button-heart">💗</div>
+            <div class="button-heart">💖</div>
+            <div class="button-heart">💕</div>
+            <div class="button-heart">💗</div>
+            <div class="button-heart">💖</div>
+            <div class="button-heart">💕</div>
+            <div class="button-heart">💗</div>
+            <div class="button-heart">💖</div>
+            <div class="button-heart">💕</div>
+        </div>
+        
+        <!-- Countdown -->
+        <div class="countdown-container" id="countdownContainer">
+            <h2 class="countdown-title">Cuenta regresiva para nuestro día 💝</h2>
+            <div class="countdown-timer">
+                <div class="time-unit">
+                    <div class="time-value" id="days">00</div>
+                    <div class="time-label">Días</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="hours">00</div>
+                    <div class="time-label">Horas</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="minutes">00</div>
+                    <div class="time-label">Minutos</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="seconds">00</div>
+                    <div class="time-label">Segundos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating hearts -->
+    <div class="floating-heart" style="left: 10%; animation-delay: 0s;">💗</div>
+    <div class="floating-heart" style="left: 30%; animation-delay: 2s;">💖</div>
+    <div class="floating-heart" style="left: 50%; animation-delay: 4s;">💕</div>
+    <div class="floating-heart" style="left: 70%; animation-delay: 6s;">💗</div>
+    <div class="floating-heart" style="left: 90%; animation-delay: 8s;">💖</div>
+    
+    <script>
+        // Wait for particles.js to load
+        window.addEventListener('load', function() {
+            // Particles.js configuration for constellation effect
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: {
+                            value: 150,
+                            density: {
+                                enable: true,
+                                value_area: 800
+                            }
+                        },
+                        color: {
+                            value: '#ffffff'
+                        },
+                        shape: {
+                            type: 'circle'
+                        },
+                        opacity: {
+                            value: 0.8,
+                            random: true,
+                            anim: {
+                                enable: true,
+                                speed: 0.5,
+                                opacity_min: 0.3,
+                                sync: false
+                            }
+                        },
+                        size: {
+                            value: 2,
+                            random: true,
+                            anim: {
+                                enable: true,
+                                speed: 2,
+                                size_min: 0.5,
+                                sync: false
+                            }
+                        },
+                        line_linked: {
+                            enable: true,
+                            distance: 150,
+                            color: '#ffffff',
+                            opacity: 0.2,
+                            width: 1
+                        },
+                        move: {
+                            enable: true,
+                            speed: 0.3,
+                            direction: 'none',
+                            random: true,
+                            straight: false,
+                            out_mode: 'out',
+                            bounce: false
+                        }
+                    },
+                    interactivity: {
+                        detect_on: 'canvas',
+                        events: {
+                            onhover: {
+                                enable: true,
+                                mode: 'grab'
+                            },
+                            resize: true
+                        },
+                        modes: {
+                            grab: {
+                                distance: 140,
+                                line_linked: {
+                                    opacity: 0.5
+                                }
+                            }
+                        }
+                    },
+                    retina_detect: true
+                });
+            }
+            
+            // Heart animation sequence
+            const heart = document.getElementById('heart');
+            const heartContainer = document.getElementById('heartContainer');
+            const mainContent = document.getElementById('mainContent');
+            
+            // Start animation sequence
+            setTimeout(() => {
+                // Move heart to corner after zoom in
+                heart.classList.add('moving-corner');
+                
+                // Show main content
+                mainContent.classList.add('visible');
+            }, 2000);
+            
+            // Button click event
+            const yesButton = document.getElementById('yesButton');
+            const buttonContainer = document.getElementById('buttonContainer');
+            const countdownContainer = document.getElementById('countdownContainer');
+            const questionElement = document.querySelector('.question');
+            
+            yesButton.addEventListener('click', function() {
+                // Hide button and question
+                buttonContainer.classList.add('hidden');
+                questionElement.style.animation = 'fadeInContent 0.5s ease-out reverse forwards';
+                
+                // Show countdown after a short delay
+                setTimeout(() => {
+                    questionElement.classList.add('hidden');
+                    countdownContainer.classList.add('visible');
+                    startCountdown();
+                }, 500);
+            });
+            
+            // Countdown functionality
+            function startCountdown() {
+                const valentinesDay = new Date('2026-02-14T00:00:00').getTime();
+                
+                function updateCountdown() {
+                    const now = new Date().getTime();
+                    const distance = valentinesDay - now;
+                    
+                    if (distance < 0) {
+                        document.getElementById('days').textContent = '00';
+                        document.getElementById('hours').textContent = '00';
+                        document.getElementById('minutes').textContent = '00';
+                        document.getElementById('seconds').textContent = '00';
+                        document.querySelector('.countdown-title').textContent = '¡Es nuestro día! 💕';
+                        return;
+                    }
+                    
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('days').textContent = String(days).padStart(2, '0');
+                    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                }
+                
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
